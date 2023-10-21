@@ -1,11 +1,16 @@
 from flask import Flask, request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from werkzeug.utils import secure_filename
+import os
+
 
 app = Flask(__name__)
 # pip install -U Flask-SQLAlchemy
 db = SQLAlchemy()
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
+STATIC_FOLDER = "static/posts/images"
+app.config['UPLOAD_FOLDER'] = STATIC_FOLDER
 db.__init__(app)
 
 # Pages:
@@ -18,6 +23,7 @@ def aboutus():
 # ------------------------------------------------
 
 class Post(db.Model):
+    STATIC_FOLDER = "posts/images"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     image = db.Column(db.String)
@@ -27,7 +33,9 @@ class Post(db.Model):
 
     @property
     def get_image_url(self):
-        return url_for('static', filename=f'posts/images/{self.image}')
+        print(f'{STATIC_FOLDER}/{self.image}')
+        return url_for('static', filename=f'{self.STATIC_FOLDER}/{self.image}')
+    
     
     @property
     def get_show_url(self):
@@ -55,7 +63,18 @@ def posts():
 def addnewpost():
     if request.method == 'POST':
         print("request received", request.form)
-        post = Post(title=request.form['title'], image=request.form['image'], body=request.form['body'])
+        post = Post(title=request.form['title'], image=request.files['image'], body=request.form['body'])
+        if 'image' in request.files:
+            file = request.files['image']
+            if file:
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
+                if post.image: # if image exists 
+                    old_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    if os.path.exists(old_file_path):
+                        os.remove(old_file_path)
+                file.save(file_path)
+                post.image = filename
         db.session.add(post)
         db.session.commit()
         return redirect(post.get_show_url)
