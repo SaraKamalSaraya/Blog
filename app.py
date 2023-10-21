@@ -33,9 +33,7 @@ class Post(db.Model):
 
     @property
     def get_image_url(self):
-        print(f'{STATIC_FOLDER}/{self.image}')
         return url_for('static', filename=f'{self.STATIC_FOLDER}/{self.image}')
-    
     
     @property
     def get_show_url(self):
@@ -55,14 +53,12 @@ class Post(db.Model):
 @app.route('/',endpoint='posts')
 def posts():
     posts = Post.query.all()
-    print (posts)
     return render_template('posts/posts.html',posts=posts)
 
 # Add New Post
 @app.route('/add_new_post', endpoint='post.add', methods=['GET', 'POST'])
 def addnewpost():
     if request.method == 'POST':
-        print("request received", request.form)
         post = Post(title=request.form['title'], image=request.files['image'], body=request.form['body'])
         if 'image' in request.files:
             file = request.files['image']
@@ -104,8 +100,19 @@ def editpost(id):
     post = Post.query.get_or_404(id)
     if request.method == 'POST':
         post.title = request.form['title']
-        post.image = request.form['image']
+        post.image = request.files['image']
         post.body = request.form['body']
+        if 'image' in request.files:
+            file = request.files['image']
+            if file:
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
+                if post.image: # if image exists 
+                    old_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    if os.path.exists(old_file_path):
+                        os.remove(old_file_path)
+                file.save(file_path)
+                post.image = filename
         db.session.commit()
         return redirect(post.get_show_url)
     return render_template('posts/editpost.html', post=post)
