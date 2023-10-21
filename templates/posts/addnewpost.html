@@ -1,0 +1,24 @@
+{% extends 'layouts/base.html' %} 
+{% block title %} Edit Post {% endblock %} 
+
+{% block content %}
+<br>
+  <h2> Add new Post </h2>
+  <br>
+  {{post}}
+  <form method="post">
+    <div class="mb-3">
+      <label class="form-label">Title</label>
+      <input type="text" name='title' class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Image</label>
+      <input type="text" name='image' class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Body</label>
+      <textarea name='body' class="form-control"></textarea>
+    </div>
+    <center><button type="submit" class="btn btn-primary w-25">Save Changes</button></center>
+  </form>
+{% endblock %}

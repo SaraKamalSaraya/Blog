@@ -1,0 +1,24 @@
+{% extends 'layouts/base.html' %} 
+{% block title %} Posts {% endblock %} 
+
+{% block content %}
+<br>
+
+<a href="{{ url_for('post.add') }}" class="btn btn-primary mb-4">Add New Post</a>
+<div class=" d-flex flex-wrap justify-content-evenly">
+    {% for post in posts %}
+        <div class="card mx-4 my-4 w-25" >
+            <img src="{{post.get_image_url}}" class="card-img-top" alt="..." width="18rem" height="200rem"/>
+            <div class="card-body">
+              <p class="card-title fw-bold fs-5">{{ post["title"] }}</p>
+              <div class="d-flex justify-content-between">
+                <a href="{{post.get_show_url}}" class="btn btn-outline-primary">Show</a>
+              <a href="{{ post.get_edit_url }}"  class="btn btn-outline-primary">Edit</a>
+              <a href="{{post.get_delete_url}}" class="btn btn-outline-primary">Delete</a>
+              </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,7 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Page not found! {%endblock%}
+
+{% block content2 %}
+<img src="{{url_for('static', filename='errors/404.jpg')}}" width="100%" height="525rem" class="mt-0 pt-0"/>
+{%endblock%}
